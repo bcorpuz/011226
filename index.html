@@ -2,19 +2,51 @@
 <html>
 <head>
     <title>Critical System Alert</title>
-    <style>
-        /* Styles for the programmer/system look */
-        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Courier New', monospace; text-align: center; padding-top: 50px; }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+     <style>
+        /* BASE STYLES (for Desktop and Mobile) */
+        body { 
+            background-color: #0d1117; 
+            color: #c9d1d9; 
+            font-family: 'Courier New', monospace; 
+            text-align: center; 
+            padding-top: 50px; 
+            /* Set a base font size that works well on most screens */
+            font-size: 18px; 
+        }
         #initial-message, #proposal-form { margin: 30px; }
         .role { color: #a371f7; font-weight: bold; }
+        
+        /* Button Styles */
         #reveal-button, button[type="submit"] { 
             background-color: #238636; /* GitHub Green */
             color: white; border: none; padding: 10px 20px; font-size: 18px; 
             cursor: pointer; border-radius: 6px; margin: 5px; 
+            /* Ensure buttons are easy to tap */
+            min-width: 150px; 
         }
         #proposal-form { display: none; } 
         .response-button:hover { opacity: 0.9; }
         #success-message { color: #238636; margin-top: 20px; font-weight: bold; }
+
+        /* --- MOBILE OPTIMIZATION (Media Query) --- */
+        @media (max-width: 600px) {
+            /* Increase font size for better readability on small screens */
+            body {
+                padding-top: 20px;
+                font-size: 16px; 
+            }
+            h1 {
+                font-size: 1.5em; /* Make headings slightly bigger */
+            }
+            #reveal-button, button[type="submit"] {
+                font-size: 20px; /* Make button text larger */
+                padding: 15px 30px; /* Make buttons physically larger for tapping */
+                display: block; /* Stack buttons vertically for easier tapping */
+                width: 80%; /* Make buttons wide */
+                margin: 10px auto; /* Center buttons */
+            }
+        }
     </style>
 </head>
 <body>
@@ -153,6 +185,7 @@
 
 </body>
 </html>
+
 
 
 
