@@ -42,24 +42,62 @@
     </form>
 
    <script>
-    // --- Role Code Dictionary ---
+    // ----------------------------------------------------------------------
+    // --- 1. CONFIGURATION (UPDATE THESE LISTS) ---
+    // ----------------------------------------------------------------------
+    
+    // **YOUR AUTHORIZED NAMES LIST** - Must match names in your URLs EXACTLY.
+    const AUTHORIZED_NAMES = [
+        "Jes", "Paeng", "Louie", "Jason", "Liam", 
+        "Jhondel", "Vincent", "Ken", "Jeremy", "Demy", "Allen" 
+    ]; 
+    
+    // Role Code Dictionary
     const ROLE_DICTIONARY = {
         'gm': 'Groomsman',
         'bm': 'Best Man',
         'us': 'Usher',
-        // Add other roles here if needed (e.g., 'bs' for Bridesman)
+        // Add other roles here if needed
     };
-    // ----------------------------
+    
+    // ----------------------------------------------------------------------
+    // --- 2. URL PARAMETER AND VALIDATION LOGIC ---
+    // ----------------------------------------------------------------------
 
-    // Get the parameters from the current URL
     const urlParams = new URLSearchParams(window.location.search);
-    const FRIEND_NAME = urlParams.get('name') || 'Friend';
+    const FRIEND_NAME = urlParams.get('name') || 'UNKNOWN'; // Pull name from URL
     const FRIEND_ROLE_CODE = urlParams.get('role') || 'gm'; 
 
     // Translate the code into the full, display name
-    const FRIEND_ROLE = ROLE_DICTIONARY[FRIEND_ROLE_CODE] || 'Groomsman'; 
+    const FRIEND_ROLE = ROLE_DICTIONARY[FRIEND_ROLE_CODE] || 'Groomsman';
+    
+    // Check if the name from the URL is in your authorized list
+    const isAuthorized = AUTHORIZED_NAMES.includes(FRIEND_NAME);
+
+    // Initial check when the page loads
+    window.onload = function() {
+        const debuggerButton = document.getElementById('reveal-button');
+        const initialMessage = document.getElementById('initial-message');
+
+        if (!isAuthorized) {
+            // If the name is NOT authorized, disable the button and show an error message
+            debuggerButton.disabled = true;
+            debuggerButton.style.backgroundColor = '#992222'; // Change color to red/gray
+            debuggerButton.innerHTML = 'ACCESS DENIED';
+            
+            // Update the error message to be more specific
+            initialMessage.querySelector('p').innerHTML = 
+                '**ERROR 403:** Authorization token is invalid. Access to core assets is denied. Contact system admin.';
+        }
+    };
+    
+    // ----------------------------------------------------------------------
+    // --- 3. CORE FUNCTIONALITY (UNMODIFIED) ---
+    // ----------------------------------------------------------------------
 
     function startPatch() {
+        // This function will only run if the button is enabled (i.e., isAuthorized is true)
+        
         // 1. Hide initial message and show the form
         document.getElementById('initial-message').style.display = 'none';
         document.getElementById('proposal-form').style.display = 'block';
@@ -69,12 +107,11 @@
         const roleSpan = document.querySelector('#proposal-form .role');
         const hiddenNameField = document.getElementById('hidden-name-field');
         const subjectField = document.getElementById('subject-field');
-        
+
         greeting.innerHTML = `Hi, <span class="role">${FRIEND_NAME}</span>!`;
-        roleSpan.innerHTML = FRIEND_ROLE; // Displays the full name (e.g., "Best Man")
+        roleSpan.innerHTML = FRIEND_ROLE;
         hiddenNameField.value = FRIEND_NAME;
         
-        // Sets the email subject for confirmation
         subjectField.value = `${FRIEND_ROLE} Proposal Accepted by ${FRIEND_NAME}`;
     }
     
@@ -84,14 +121,12 @@
         const form = event.target;
         const data = new FormData(form);
         
-        // Send the data to Formspree
         await fetch(form.action, {
             method: form.method,
             body: data,
             headers: { 'Accept': 'application/json' }
         });
 
-        // Show the success message and hide the buttons
         document.getElementById('proposal-form').querySelector('p:last-child').style.display = 'none';
         document.getElementById('proposal-form').querySelectorAll('.response-button').forEach(btn => btn.style.display = 'none');
         document.getElementById('success-message').style.display = 'block';
@@ -100,6 +135,7 @@
 
 </body>
 </html>
+
 
 
 
