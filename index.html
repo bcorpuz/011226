@@ -46,18 +46,29 @@
     // --- 1. CONFIGURATION (UPDATE THESE LISTS) ---
     // ----------------------------------------------------------------------
     
-    // **YOUR AUTHORIZED NAMES LIST** - Must match names in your URLs EXACTLY.
-    const AUTHORIZED_NAMES = [
-        "Jes", "Paeng", "Louie", "Jason", "Liam", 
-        "Jhondel", "Vincent", "Ken", "Jeremy", "Demy", "Allen" 
-    ]; 
+    // **YOUR AUTHORIZED NAME-ROLE PAIRS**
+    // Key: The exact name (case-sensitive) as it appears in the URL
+    // Value: The required role code (e.g., 'bm' or 'gm')
+    const AUTHORIZED_PAIRS = {
+        "Bestest": "bm",      // John MUST have role=bm
+        "Bespren": "bm",      // Mike MUST have role=gm
+        "Jhondel": "gm",      // Alex MUST have role=gm
+        "Jes": "gm",
+        "Paeng": "gm",       // Sam MUST have role=us (Usher)
+        "Jason": "gm",
+        "Ken": "gm",
+        "Louie": "gm",
+        "Liam": "gm",
+        "Je": "gm",
+        "Vincent": "gm"
+        // Add your remaining groomsmen here!
+    }; 
     
-    // Role Code Dictionary
+    // Role Code Dictionary (Translates code for display/email)
     const ROLE_DICTIONARY = {
         'gm': 'Groomsman',
         'bm': 'Best Man',
         'us': 'Usher',
-        // Add other roles here if needed
     };
     
     // ----------------------------------------------------------------------
@@ -65,14 +76,21 @@
     // ----------------------------------------------------------------------
 
     const urlParams = new URLSearchParams(window.location.search);
-    const FRIEND_NAME = urlParams.get('name') || 'UNKNOWN'; // Pull name from URL
-    const FRIEND_ROLE_CODE = urlParams.get('role') || 'gm'; 
+    const FRIEND_NAME = urlParams.get('name');
+    const FRIEND_ROLE_CODE = urlParams.get('role'); 
 
-    // Translate the code into the full, display name
+    // Find the correct role code based on the name (the one we *expect* to see)
+    const EXPECTED_ROLE_CODE = AUTHORIZED_PAIRS[FRIEND_NAME];
+    
+    // Translate the code for display/email
     const FRIEND_ROLE = ROLE_DICTIONARY[FRIEND_ROLE_CODE] || 'Groomsman';
     
-    // Check if the name from the URL is in your authorized list
-    const isAuthorized = AUTHORIZED_NAMES.includes(FRIEND_NAME);
+    // Check if the URL name and role code are valid together
+    // The link is authorized if:
+    // 1. The name exists in our list AND
+    // 2. The role code in the URL matches the expected role code for that name.
+    const isAuthorized = FRIEND_ROLE_CODE === EXPECTED_ROLE_CODE;
+
 
     // Initial check when the page loads
     window.onload = function() {
@@ -80,29 +98,29 @@
         const initialMessage = document.getElementById('initial-message');
 
         if (!isAuthorized) {
-            // If the name is NOT authorized, disable the button and show an error message
+            // If the name-role pair is NOT authorized, lock down the page
             debuggerButton.disabled = true;
-            debuggerButton.style.backgroundColor = '#992222'; // Change color to red/gray
+            debuggerButton.style.backgroundColor = '#992222';
             debuggerButton.innerHTML = 'ACCESS DENIED';
             
-            // Update the error message to be more specific
+            // Update the error message
             initialMessage.querySelector('p').innerHTML = 
-                '**ERROR 403:** Authorization token is invalid. Access to core assets is denied. Contact system admin.';
+                '**ERROR 403:** Authorization token is invalid or corrupted. Access to core assets is denied. Contact system admin.';
         }
     };
     
     // ----------------------------------------------------------------------
-    // --- 3. CORE FUNCTIONALITY (UNMODIFIED) ---
+    // --- 3. CORE FUNCTIONALITY ---
     // ----------------------------------------------------------------------
 
     function startPatch() {
-        // This function will only run if the button is enabled (i.e., isAuthorized is true)
+        // This function will only run if the button is enabled
         
         // 1. Hide initial message and show the form
         document.getElementById('initial-message').style.display = 'none';
         document.getElementById('proposal-form').style.display = 'block';
 
-        // 2. Personalize the elements using the data pulled from the URL
+        // 2. Personalize the elements
         const greeting = document.getElementById('greeting');
         const roleSpan = document.querySelector('#proposal-form .role');
         const hiddenNameField = document.getElementById('hidden-name-field');
@@ -135,6 +153,7 @@
 
 </body>
 </html>
+
 
 
 
